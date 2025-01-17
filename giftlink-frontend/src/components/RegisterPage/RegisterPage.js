@@ -18,7 +18,7 @@ function RegisterPage() {
                     <div className="register-card p-4 border rounded">
                         <h2 className="text-center mb-4 font-weight-bold">Register</h2>
                         <div className="mb-4">
-                            <label htmlFor="firstName" className="form label"> FirstName</label><br/>
+                            <label htmlFor="firstName" className="form-label"> FirstName</label><br/>
                         <input
                             id="firstName"
                             type="text"
