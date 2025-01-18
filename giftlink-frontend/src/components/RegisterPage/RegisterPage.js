@@ -28,6 +28,22 @@ function RegisterPage() {
                 password
             })
         })
+        // get json reponse
+        const{authtoken, email:jsonemail, error}  = await reponse.json();
+        //store user details in the session storage       
+        if(authtoken){
+            sessionStorage.setItem('auth-token', authtoken);
+            sessionStorage.setItem('name', firstName);
+            sessionStorage.setItem('email',jsonemail)
+            //set variable contex IsLoggedIn
+            setIsLoggedIn(true);
+            //Navigate to the app
+            navigate('/app');
+        }
+        //Set errror
+        if(error){
+            setShowerr(error);
+        }
     }
     return (
         <div className="container mt-5">
@@ -69,6 +85,7 @@ function RegisterPage() {
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
                         />
+                        <div className="text-danger">{showerr}</div>
                     </div>
                     <div className="mb-4">
                         <label htmlFor="password" className="form-label">Password</label>

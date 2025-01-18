@@ -16,7 +16,7 @@ router.get('/', async (req, res, next) => {
         const{ name, category, condition,age_years } = req.query;
         // Add the name filter to the query if the name parameter is not empty
         if (name && name.trim() !== '') {
-            query.name = { $regex: req.query.name, $options: "i" }; // Using regex for partial match, case-insensitive
+            query.name = { $regex: name, $options: "i" }; // Using regex for partial match, case-insensitive
         }
 
         // Task 3: Add other filters to the query
