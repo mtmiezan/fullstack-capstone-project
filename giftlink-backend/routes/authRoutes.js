@@ -10,7 +10,7 @@ const dotenv = require('dotenv');
 const pino = require('pino');
 const collectionName = 'users'
 //Step 1 - Task 3: Create a Pino logger instance
-const looger = pino();
+const logger = pino();
 
 dotenv.config();
 
@@ -25,18 +25,18 @@ router.post('/register', async (req, res) => {
         // Task 2: Access MongoDB collection
         const collection = db.collection(collectionName);
 
-        const { email, firstName, lastName } = req.body;
+        const { email, firstName, lastName, password } = req.body;
         //Task 3: Check for existing email
         const existingEmail = await collection.findOne({ email: email });
 
         const salt = await bcryptjs.genSalt(10);
-        const hash = await bcryptjs.hash(req.body.password, salt);
+        const hash = await bcryptjs.hash(password, salt);
 
         // {{insert code here}} //Task 4: Save user details in database
 
-        if (existingEmail) {
-            return res.status(404).send('User already registered');
-        }
+        // if (existingEmail) {
+        //     return res.status(404).send('User already registered');
+        // }
         const newUser = await collection.insertOne({
             email,
             firstName,
