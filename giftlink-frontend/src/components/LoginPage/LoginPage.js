@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { urlConfig } from '../../config';
 import { useAppContext } from '../../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
@@ -14,9 +14,8 @@ function LoginPage() {
     const { setIsLoggedIn } = useAppContext();
 
     // User already logged in
-    useEffetct(() => {
+    useEffect(() => {
         if (sessionStorage.getItem('auth-token')) {
-            logger.info('user already logged in');
             navigate('/app');
         }
     }, [navigate]);
@@ -26,7 +25,7 @@ function LoginPage() {
         try {
             //Step 1: Implement API call
             const url = `${urlConfig.backendUrl}/api/auth/login`;
-            const reponse = await fectch(url, {
+            const reponse = await fetch(url, {
                 method: 'POST',
                 headers: {
                     'content-type': 'application/json',
@@ -53,7 +52,6 @@ function LoginPage() {
             else {
                 document.getElementById("email").value = "";
                 document.getElementById("password").value = "";
-                logger.error('Wrong password. Try again.');
                 setIncorrect('Wrong password. Try again.');
                 // Clear incorrect message after 2 secondes
                 setTimeout(() => {
