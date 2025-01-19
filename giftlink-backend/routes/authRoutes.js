@@ -4,7 +4,7 @@ const app = express();
 const router = express.Router();
 const bcryptjs = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const { body, validationResu } = require('express-validator');
+const { body, validationResult } = require('express-validator');
 const connectToDatabase = require('../models/db');
 const dotenv = require('dotenv');
 const pino = require('pino');
@@ -57,8 +57,15 @@ router.post('/login', async (req, res) => {
 });
 
 // Register endpoint
-router.post('/register', async (req, res) => {
+router.post('/register', body('email').isEmail(),async (req, res) => {
     try {
+        //validate email
+       const result = validationResult(req);
+        if(!result.isEmpty()){
+            logger.error('Email invalid');
+            res.status(404).json({ error: 'Email invalid'});
+            return;
+        }
         // Task 1: Connect to `giftsdb` in MongoDB through `connectToDatabase` in `db.js`
         const db = await connectToDatabase();
 
