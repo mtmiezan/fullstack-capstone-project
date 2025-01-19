@@ -20,10 +20,10 @@ router.get('/', async (req, res, next) => {
         }
 
         // Task 3: Add other filters to the query
-        if (category) {
+        if (category && category.trim() !== '') {
             query.category = category;
         }
-        if (condition) {
+        if (condition && condition.trim() !== '') {
             query.condition = condition;
         }
         if (age_years) {
