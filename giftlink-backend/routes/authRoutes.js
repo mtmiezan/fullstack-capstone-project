@@ -16,6 +16,56 @@ dotenv.config();
 
 //Step 1 - Task 4: Create JWT secret
 const JWT_SECRET = process.env.JWT_SECRET;
+
+// update profil endpoint
+router.put('/update', async (req, res) => {
+    //validation email
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        logger.error('Validation errors in update resquest', errors.array());
+        return res.status(400).json({ errors: errors.array() });
+    }
+
+    try {
+        //check email req header
+        const email = req.headers.email; if (!email) {
+            logger.error('Email not found in the request headers');
+            return res.status(400).json({ error: 'Email not found in the request headers' });
+        }
+        // Task 4: Connect to MongoDB
+        const db = await connectToDatabase();
+        const collection = db.collection(collectionName);
+        // Task 5: find user credentials in database
+        const existingUser = await collection.findOne({ email });
+
+        if (!existingUser) {
+            //logger.error('User not found');
+            return res.status(404).json({ error: 'User not found' });
+        }
+        existingUser.firstName = req.body.firstName;
+        existingUser.updatedAt = new Date();
+        console.log('existingUser :', existingUser)
+        const updateUser = await collection.findOneAndUpdate(
+            { email },
+            { $set: existingUser },
+            { returnNewDocument: true }
+        );
+        // Task 7: create JWT authentication using secret key from .env file
+        const payload = {
+            user: {
+                id: updateUser._id.toString(),
+            }
+        }
+        const authtoken = jwt.sign(payload, JWT_SECRET);
+        logger.info('User updated successfully')
+        res.json({ authtoken });
+    } catch (error) {
+        logger.error(error);
+        return res.status(500).send('Internal server error');
+
+    }
+});
+
 //Login endpoint
 router.post('/login', async (req, res) => {
     try {
@@ -24,46 +74,46 @@ router.post('/login', async (req, res) => {
         // Task 2: Access MongoDB `users` collection
         const collection = db.collection(collectionName);
         // Task 3: Check for user credentials in database
-        const theUser = await collection.findOne({email: req.body.email});
+        const theUser = await collection.findOne({ email: req.body.email });
         // Task 4: Task 4: Check if the password matches the encrypyted password and send appropriate message on mismatch
-        if(theUser){
+        if (theUser) {
             let result = await bcryptjs.compare(req.body.password, theUser.password);
-            if(!result){
+            if (!result) {
                 logger.error('passwords do not macth');
                 return res.status(404).json({ error: 'wrong password' });
             }
-             // Task 5: Fetch user details from database
-            const { _id:userID,firstName:userName, email:userEmail } = theUser;
-              // Task 6: Create JWT authentication if passwords match with user._id as payload
+            // Task 5: Fetch user details from database
+            const { _id: userID, firstName: userName, email: userEmail } = theUser;
+            // Task 6: Create JWT authentication if passwords match with user._id as payload
             let payload = {
                 user: {
                     id: userID.toString(),
                 }
             }
-           const authtoken = jwt.sign(payload, JWT_SECRET);
-           logger.info('User logged in successfully');
-           res.json({authtoken, userName, userEmail });
+            const authtoken = jwt.sign(payload, JWT_SECRET);
+            logger.info('User logged in successfully');
+            res.json({ authtoken, userName, userEmail });
         }
-        else{
+        else {
             logger.error('User not found');
-            res.status(404).json({ error: 'User not found'});
+            res.status(404).json({ error: 'User not found' });
         }
-            
+
         // Task 7: Send appropriate message if user not found
     } catch (e) {
-         return res.status(500).send('Internal server error');
+        return res.status(500).send('Internal server error');
 
     }
 });
 
 // Register endpoint
-router.post('/register', body('email').isEmail(),async (req, res) => {
+router.post('/register', body('email').isEmail(), async (req, res) => {
     try {
         //validate email
-       const result = validationResult(req);
-        if(!result.isEmpty()){
+        const result = validationResult(req);
+        if (!result.isEmpty()) {
             logger.error('Email invalid');
-            res.status(404).json({ error: 'Email invalid'});
+            res.status(404).json({ error: 'Email invalid' });
             return;
         }
         // Task 1: Connect to `giftsdb` in MongoDB through `connectToDatabase` in `db.js`
