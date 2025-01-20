@@ -43,7 +43,7 @@ function LoginPage() {
                 //Set user details in session storage
                 sessionStorage.setItem('auth-token', authtoken);
                 sessionStorage.setItem('name', userName);
-                sessionStorage.setItem('emai', userEmail);
+                sessionStorage.setItem('email', userEmail);
                 //Set the state of the user to logged in  on app context
                 setIsLoggedIn(true);
                 //Navigate to main page
